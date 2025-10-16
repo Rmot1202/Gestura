@@ -125,7 +125,6 @@ Gestura bridges the communication gap between Deaf and hearing communities throu
 ---
 
 ## Wireframes
+![Justora Wireframes](docs/justora-wireframe.svg)
 
-[Add picture of your hand-sketched wireframes in this section]  
-<img src="YOUR_WIREFRAME_IMAGE_URL" width=600>
 
