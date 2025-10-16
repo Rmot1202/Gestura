@@ -1,8 +1,3 @@
----
-title: Mobile App Dev - App Brainstorming Example
-
----
-
 # Mobile App Dev - App Brainstorming Example
 
 ---
@@ -45,6 +40,8 @@ title: Mobile App Dev - App Brainstorming Example
 
 ## Top 3 New App Ideas
 1. Gestura  
+2. Gestura Live
+3. StreamLens
 
 ---
 
@@ -77,6 +74,66 @@ title: Mobile App Dev - App Brainstorming Example
   - **V4:** Integrate multilingual translation (e.g., Spanish/Japanese to English via ASL).  
   - **V5:** Full LinguaLift smart mask integration for automatic updates and offline use.
 
+---
+### 2. Gestura Live
+
+* **Description:**
+  Gestura Live is a real-time classroom and meeting companion that provides **live captions**, an **ASL avatar side panel**, and **slide synchronization** for lectures, Zoom/Meet calls, and in-person talks. It lets attendees follow along with low-latency captions, see a signing avatar for key content, drop highlights/notes, and export sessions into polished recordings for later study.
+
+* **Category:** Accessibility / Education / AI / Productivity
+
+* **Mobile:**
+  Mobile (and web) are essential. The app uses the **microphone** (or system audio) for streaming ASR, optional **camera** for Sign→Text (beta) from Deaf presenters, and **APIs** for text→ASL avatar generation and glossary enforcement. Push notifications alert users when sessions start, slides change, highlights are shared, or exports are ready.
+
+* **Story:**
+  Gestura Live levels the playing field in classrooms and meetings. A student joins a session, turns on captions and the ASL avatar panel, and instantly follows complex topics—even in noisy rooms. Instructors get automatic chapters and slide-linked transcripts; accessibility staff gain consistent, reviewable outputs.
+
+* **Market:**
+
+  * **Primary:** Deaf and hard-of-hearing students/professionals, accessibility offices, instructors, note-takers, and meeting organizers.
+  * **Secondary:** Universities, K–12 districts, hospitals, enterprises, and government agencies standardizing accessible meetings.
+    Monetization may include institutional licenses, per-seat live minutes, premium latency/quality tiers, and compliance add-ons (FERPA/HIPAA options).
+
+* **Habit:**
+  Used during every class/meeting. Attendees rely on live captions + avatar; instructors and coordinators use highlights and post-session exports. Streaks for attendance, note-taking badges, and shared class glossaries encourage continued engagement.
+
+* **Scope:**
+
+  * **V1:** Live ASR captions with speaker labels; low-latency text→ASL avatar panel; manual highlights; basic slide markers; export to MP4/HLS with captions.
+  * **V2:** Automatic slide-change detection; glossary dictionaries per course; better punctuation/stability controls; one-click LMS publish.
+  * **V3:** Sign→Text (beta) input channel for Deaf presenters; collaborative notes; real-time Q&A tied to timestamps.
+  * **V4:** Domain presets (STEM/Medical/Legal) with tuned glossaries; multi-language captions; interpreter handoff mode.
+  * **V5:** Deep integration with **Recorded Lectures** app: auto-cleaned transcripts, avatar re-rendering for quality, and analytics (comprehension hotspots, replay stats).
+---
+### 3. StreamLens
+
+* **Description:**
+  StreamLens is a cross-platform companion app that shows **movie and TV metadata** based on the **streaming subscriptions you already have** (e.g., Netflix, Hulu, Prime Video). It doesn’t play content; it aggregates **titles, posters, synopses, cast/crew, genres, runtimes, ratings**, and availability on your services. It tracks what you’ve watched, lets you rate titles, and **recommends** new ones based on your subscriptions and viewing history.
+
+* **Category:** Entertainment / Discovery / Productivity
+
+* **Mobile:**
+  Mobile (and web) are essential. The app connects to your providers via secure sign-in, uses **APIs** to pull availability and artwork, and supports **push notifications** for expiring titles, new drops on your services, and watchlist reminders. Optional location/locale helps surface region-correct catalogs.
+
+* **Story:**
+  You open StreamLens and see a clean feed of movies you can **actually watch right now** with your subscriptions. One tap shows details (poster, trailer link, cast, critic and user ratings). You mark what you’ve seen, leave a quick rating, and the app refines recommendations that fit **your** services and taste.
+
+* **Market:**
+
+  * **Primary:** Streaming power users, students, families, and film fans juggling multiple subscriptions.
+  * **Secondary:** Dorms, hotels, and community centers that want a shared “what to watch” board.
+    Monetization could include premium filters (4K/Atmos, director cuts), early-access alerts, affiliate revenue for add-on services, and family plans.
+
+* **Habit:**
+  Used a few times per week—before movie nights and during commutes. Streaks for logging, seasonal challenges (e.g., “Spooky October 5”), and shared lists with friends keep engagement high.
+
+* **Scope:**
+
+  * **V1:** Connect subscriptions; browse **only-on-your-services** catalog; title pages (poster, synopsis, cast, runtime, genres); basic **ratings**; **watchlist** and **watched history**; simple recommendations seeded by your ratings + services.
+  * **V2:** Smarter recs (collaborative + content-based), **tags** (mood/pace), **expiring soon** and **new this week**; filter by runtime, year, MPAA, language.
+  * **V3:** **Social**: shared lists, friend activity (opt-in), group watch picks; **notify when a title moves** to one of your services.
+  * **V4:** **Profiles** (household members), multi-criteria “movie night” picker, **calendar view** for releases; offline access to your lists/ratings.
+  * **V5:** Cross-device sync (TV companion app), **privacy modes**, advanced analytics (discoverability score, creator stats), and integrations with smart assistants for voice search.
 ---
 
 ## Summary Table
