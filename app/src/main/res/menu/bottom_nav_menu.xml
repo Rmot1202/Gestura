@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/translationFragment"
+        android:icon="@drawable/ic_translate"
+        android:title="Translate" />
+    <item
+        android:id="@+id/avatarFragment"
+        android:icon="@drawable/ic_avatar"
+        android:title="Avatar" />
+    <item
+        android:id="@+id/aslFragment"
+        android:icon="@drawable/ic_asl"
+        android:title="ASL" />
+    <item
+        android:id="@+id/contributeFragment"
+        android:icon="@drawable/ic_contribute"
+        android:title="Contribute"/>
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings" />
+</menu>

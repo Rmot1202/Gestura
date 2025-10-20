@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/translationFragment">
+
+    <fragment
+        android:id="@+id/translationFragment"
+        android:name="com.example.gestura.TranslationFragment"
+        android:label="Translate" />
+
+    <fragment
+        android:id="@+id/avatarFragment"
+        android:name="com.example.gestura.AvatarFragment"
+        android:label="Avatar" />
+
+    <fragment
+        android:id="@+id/aslFragment"
+        android:name="com.example.gestura.AslFragment"
+        android:label="ASL" />
+
+    <fragment
+        android:id="@+id/contributeFragment"
+        android:name="com.example.gestura.ContributeFragment"
+        android:label="Contribute" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.gestura.SettingsFragment"
+        android:label="Settings" />
+</navigation>
