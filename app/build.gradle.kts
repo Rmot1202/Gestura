@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -22,6 +23,11 @@ android {
 
         buildConfigField("String", "LARA_ACCESS_KEY_ID", "\"7LSFSJI1FCKIKU2V583MBONTUQ\"")
         buildConfigField("String", "LARA_ACCESS_KEY_SECRET", "\"y3-Xkj0v7ckHc1rH0D1KHyKVRCkQ8PSWwiXDTBMjQgk\"")
+        // Your API Gateway base (no trailing slash), e.g. https://abc123.execute-api.us-east-1.amazonaws.com/prod
+        buildConfigField("String", "GENASL_BASE_URL", "\"https://<api-id>.execute-api.<region>.amazonaws.com/prod\"")
+        // Only if your API is protected by a key
+        buildConfigField("String", "GENASL_API_KEY", "\"<optional-api-key-or-empty>\"")
+
     }
 
     buildTypes {
@@ -38,6 +44,7 @@ android {
         buildConfig = true
         // Enable compose, which is necessary for the Compose compiler plugin
         compose = true
+        viewBinding = true
     }
 
     compileOptions {
@@ -73,10 +80,29 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.material) // from com.google.android.material
     implementation(libs.lara.sdk)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.annotation)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 
     // Test dependencies using aliases
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit.ext)
     androidTestImplementation(libs.androidx.espresso.core)
+
+
+    // Compose Material Icons (Filled/Outlined/etc.)
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // Video playback
+    implementation("androidx.media3:media3-exoplayer:1.4.1")
+    implementation("androidx.media3:media3-ui:1.4.1")
+    implementation("androidx.media3:media3-exoplayer-hls:1.4.1") // if your API returns HLS
+
+    // Networking + JSON
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+
 }
 
