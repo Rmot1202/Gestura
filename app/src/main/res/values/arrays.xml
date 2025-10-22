@@ -1,10 +1,32 @@
 <resources>
-    <!-- Reply Preference -->
+    <string-array name="settings_languages">
+        <item>English</item>
+        <item>Spanish</item>
+        <item>French</item>
+    </string-array>
+    <string-array name="settings_languages_values">
+        <item>en</item>
+        <item>es</item>
+        <item>fr</item>
+    </string-array>
+
+    <string-array name="settings_themes">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Auto</item>
+    </string-array>
+    <string-array name="settings_themes_values">
+        <item>light</item>
+        <item>dark</item>
+        <item>auto</item>
+    </string-array>
+    <!-- Reply Entries: The text the user sees -->
     <string-array name="reply_entries">
         <item>Reply</item>
         <item>Reply to all</item>
     </string-array>
 
+    <!-- Reply Values: The values saved in preferences -->
     <string-array name="reply_values">
         <item>reply</item>
         <item>reply_all</item>

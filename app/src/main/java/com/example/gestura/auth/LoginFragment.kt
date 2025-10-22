@@ -4,7 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -16,13 +20,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class LoginFragment : Fragment() {
-
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val scope = MainScope()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_login, container, false)
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.fragment_login, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val emailEt = view.findViewById<EditText>(R.id.etEmail)
@@ -55,9 +57,7 @@ class LoginFragment : Fragment() {
                     errorTv.text = e.message
                 } catch (e: Exception) {
                     errorTv.text = e.localizedMessage ?: "Sign-in failed"
-                } finally {
-                    setLoading(false)
-                }
+                } finally { setLoading(false) }
             }
         }
 
@@ -70,16 +70,13 @@ class LoginFragment : Fragment() {
                     require(email.isNotEmpty()) { "Email required" }
                     require(pass.length >= 6) { "Password must be ≥ 6 characters" }
                     auth.createUserWithEmailAndPassword(email, pass).await()
-                    // Optional: email verification (non-blocking)
                     runCatching { auth.currentUser?.sendEmailVerification()?.await() }
                     toHome()
                 } catch (e: IllegalArgumentException) {
                     errorTv.text = e.message
                 } catch (e: Exception) {
                     errorTv.text = e.localizedMessage ?: "Sign-up failed"
-                } finally {
-                    setLoading(false)
-                }
+                } finally { setLoading(false) }
             }
         }
 
@@ -93,20 +90,15 @@ class LoginFragment : Fragment() {
                     Toast.makeText(requireContext(), "Reset email sent", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
                     errorTv.text = e.localizedMessage ?: "Reset failed"
-                } finally {
-                    setLoading(false)
-                }
+                } finally { setLoading(false) }
             }
         }
     }
 
     private fun toHome() {
         findNavController().navigate(
-            R.id.aslFragment,
-            null,
-            androidx.navigation.navOptions {
-                popUpTo(R.id.loginFragment) { inclusive = true }
-            }
+            R.id.aslFragment, null,
+            androidx.navigation.navOptions { popUpTo(R.id.loginFragment) { inclusive = true } }
         )
     }
 
