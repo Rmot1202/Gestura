@@ -61,6 +61,10 @@ android {
 }
 
 dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
     // Correctly implement the Compose BOM
     implementation(platform(libs.androidx.compose.bom))
 
@@ -70,7 +74,13 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.material3)
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
 
+    implementation("org.tensorflow:tensorflow-lite-task-vision:0.4.4")
+
+    implementation("com.google.mediapipe:tasks-vision:0.20230731")
+
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     // Use aliases for your other dependencies as well for consistency
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -84,6 +94,7 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.genai.common)
 
     // Test dependencies using aliases
     testImplementation(libs.junit)
