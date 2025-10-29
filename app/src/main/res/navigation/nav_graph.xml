@@ -22,8 +22,10 @@
 
     <fragment
         android:id="@+id/aslFragment"
-        android:name="com.example.gestura.AslFragment"
-        android:label="ASL" />
+        android:name="com.example.gestura.ui.OnDeviceCaptionFragment"
+        android:label="ASL"
+        tools:layout="@layout/fragment_compose_host" />
+
 
     <fragment
         android:id="@+id/contributeFragment"

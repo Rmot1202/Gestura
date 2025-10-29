@@ -50,8 +50,6 @@ import com.example.gestura.BuildConfig
 import com.example.gestura.caption.Captioner
 import com.example.gestura.caption.NlpCaptioner
 import com.example.gestura.caption.Segment
-import com.example.gestura.ml.to126D
-import com.example.gestura.network.HolisticClient
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
@@ -64,15 +62,9 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OnDeviceCaptionScreen() {
+fun OnDeviceCaptionScreen_inapp() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
-    // ----- CONFIG: set your server base URL here -----
-    // Emulator -> host machine:
-    val baseUrl = "http://10.0.2.2:8000/"
-    // Physical phone on same Wi-Fi (example):
-    // val baseUrl = "http://192.168.1.23:8000/"
 
     // State
     var videoUri by remember { mutableStateOf<Uri?>(null) }
@@ -86,19 +78,35 @@ fun OnDeviceCaptionScreen() {
     var isPlaying by remember { mutableStateOf(false) }
     var currentOverlay by remember { mutableStateOf<String?>(null) }
     var currentConfidence by remember { mutableStateOf<Int?>(null) }
+
+    // Simple history of saved sentences
     var history by remember { mutableStateOf(listOf<String>()) }
 
-    // TTS
+    // TTS instance held in state
     var ttsInstance by remember { mutableStateOf<TextToSpeech?>(null) }
+
     DisposableEffect(context) {
+        // Declare a mutable variable to hold the TextToSpeech instance.
+        // This ensures the variable 'tts' is resolved at compile time.
         var tts: TextToSpeech? = null
+
         tts = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
+                // At this point, 'tts' has been assigned the TextToSpeech instance.
+                // We can use the non-null assertion operator '!!' here because
+                // onInit is called after successful construction.
                 tts!!.language = Locale.US
-                ttsInstance = tts
-            } else ttsInstance = null
+                ttsInstance = tts // Assign the configured TTS to the Composable's state
+            } else {
+                ttsInstance = null
+            }
         }
-        onDispose { tts?.stop(); tts?.shutdown() }
+        onDispose {
+            // Use safe call '?' because 'tts' could potentially still be null
+            // if the TextToSpeech constructor itself failed before assignment.
+            tts?.stop()
+            tts?.shutdown()
+        }
     }
 
     // SAF picker
@@ -122,6 +130,9 @@ fun OnDeviceCaptionScreen() {
                 )
             }
 
+            // Must match your model’s input feature dimension
+            val FEAT_DIM = 126 // hands-only example: 2*21*3
+
             scope.launch {
                 try {
                     val apiKey = BuildConfig.OPENAI_API_KEY
@@ -129,27 +140,16 @@ fun OnDeviceCaptionScreen() {
                         "Missing OPENAI_API_KEY. Add it to local.properties and Gradle Sync."
                     }
 
-                    // ====== SERVER HOLISTIC CALL ======
-                    val api = HolisticClient.api(baseUrl)
-                    val part = HolisticClient.asStreamingPart(context, uri)
-                    val resp = api.landmarks(part)   // {fps, duration, frames[{t, lh, rh}]}
-
-                    // Landmarks -> 126-D features per frame
-                    val features = to126D(resp.frames)
-
-                    // ====== YOUR ON-DEVICE CLASSIFIER ======
-                    // Implement this once in your Captioner (simple wrapper around TFLite/TF):
-                    // fun classifyFromFeatures(features: List<FloatArray>, fps: Int): Pair<List<Segment>, Double>
-                    val (segs, dur) = Captioner.classifyFromFeatures(features, resp.fps)
-
+                    // 1) On-device pipeline → segments + duration
+                    val (segs, dur) = Captioner.run(context, uri, FEAT_DIM)
                     segments = segs
                     durationSec = dur
 
-                    // Gloss from tokens
+                    // 2) Gloss from tokens
                     val gloss = segs.joinToString(" ") { it.token }
                     glossText = gloss
 
-                    // NLP: gloss → sentence
+                    // 3) NLP: gloss → natural sentence
                     val sentence = NlpCaptioner.glossToSentence(
                         context = context,
                         gloss = gloss,
@@ -157,15 +157,15 @@ fun OnDeviceCaptionScreen() {
                     ).ifBlank { "[unrecognized]" }
                     finalCaption = sentence
 
-                    // Build SRT for full duration (fallback to last segment end)
+                    // 4) Build SRT for full duration (fallback to last segment end)
                     val total = if (dur > 0.1) dur else (segs.maxOfOrNull(Segment::end) ?: 5.0)
                     val srt = NlpCaptioner.singleLineToSrt(sentence, total)
 
-                    // Save SRT and set URI for playback
+                    // 5) Save SRT and set URI
                     srtFile = NlpCaptioner.saveSrt(context, srt)
                     videoUri = uri
-                } catch (e: Exception) {
-                    errorMsg = e.message ?: "Processing failed."
+                } catch (t: Throwable) {
+                    errorMsg = t.message ?: "Captioning failed."
                 } finally {
                     busy = false
                 }
@@ -173,12 +173,13 @@ fun OnDeviceCaptionScreen() {
         }
     }
 
-    // ============= UI =============
+    // UI
     Column(
         Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        // Header
         Surface(tonalElevation = 1.dp, shadowElevation = 0.dp) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                 Text("ASL Translation", style = MaterialTheme.typography.titleLarge)
@@ -190,6 +191,7 @@ fun OnDeviceCaptionScreen() {
             }
         }
 
+        // Scrollable content
         Column(
             Modifier
                 .weight(1f)
@@ -198,6 +200,7 @@ fun OnDeviceCaptionScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
+            // Video card (aspect 3/4, rounded)
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -219,6 +222,7 @@ fun OnDeviceCaptionScreen() {
                         modifier = Modifier.fillMaxSize()
                     )
 
+                    // Clear button (top-right)
                     TextButton(
                         onClick = {
                             videoUri = null
@@ -234,9 +238,12 @@ fun OnDeviceCaptionScreen() {
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(12.dp),
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color.White
+                        )
                     ) { Text("✕") }
 
+                    // Live overlay like the React version (bottom gradient)
                     if (!currentOverlay.isNullOrBlank() && isPlaying) {
                         Box(
                             Modifier
@@ -272,6 +279,7 @@ fun OnDeviceCaptionScreen() {
                         }
                     }
                 } else {
+                    // Empty state
                     Column(
                         Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -290,6 +298,7 @@ fun OnDeviceCaptionScreen() {
                 }
             }
 
+            // Controls (Upload + Play/Pause)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (videoUri != null && srtFile != null) {
                     Button(onClick = { isPlaying = !isPlaying }) {
@@ -298,6 +307,7 @@ fun OnDeviceCaptionScreen() {
                 }
             }
 
+            // Current translation card (like the React card)
             if (!finalCaption.isNullOrBlank() && !isPlaying) {
                 Card {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -340,6 +350,7 @@ fun OnDeviceCaptionScreen() {
                 }
             }
 
+            // Detected signs (from segments, most recent first)
             if (segments.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Detected Signs", style = MaterialTheme.typography.titleMedium)
@@ -362,6 +373,7 @@ fun OnDeviceCaptionScreen() {
                 }
             }
 
+            // Saved translations (history)
             if (history.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Saved Translations", style = MaterialTheme.typography.titleMedium)
@@ -371,7 +383,11 @@ fun OnDeviceCaptionScreen() {
                             tonalElevation = 1.dp,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(item, Modifier.padding(12.dp), style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                item,
+                                Modifier.padding(12.dp),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                         }
                     }
                 }
@@ -384,6 +400,12 @@ fun OnDeviceCaptionScreen() {
     }
 }
 
+/**
+ * Player with SRT subtitles + live overlay text.
+ * - Prefers current subtitle cue text;
+ * - Falls back to latest finished Segment token;
+ * - Reports "confidence" if available on Segment (optional).
+ */
 @Composable
 private fun PlayerWithOverlay(
     video: Uri,
@@ -409,6 +431,7 @@ private fun PlayerWithOverlay(
             )
         ).build()
 
+    // Prepare when media changes
     LaunchedEffect(video, srt) {
         player.setMediaItem(mediaItem)
         player.prepare()
@@ -416,21 +439,27 @@ private fun PlayerWithOverlay(
         onPlayingChanged(false)
     }
 
+    // Apply external play/pause intent
     LaunchedEffect(desiredPlaying) {
         player.playWhenReady = desiredPlaying
     }
 
+    // Observe playback, update overlay
     LaunchedEffect(player, segments) {
         while (true) {
             onPlayingChanged(player.isPlaying)
+
             val cueText = player.currentCues.cues.firstOrNull()?.text?.toString()
             if (!cueText.isNullOrBlank()) {
                 onOverlayChanged(cueText, null)
             } else {
                 val tSec = player.currentPosition / 1000.0
                 val seg = segments.filter { it.end <= tSec }.maxByOrNull { it.end }
-                if (seg != null) onOverlayChanged(seg.token, segConfidence(seg))
-                else onOverlayChanged(null, null)
+                if (seg != null) {
+                    onOverlayChanged(seg.token, segConfidence(seg))
+                } else {
+                    onOverlayChanged(null, null)
+                }
             }
             delay(150)
         }
@@ -442,7 +471,14 @@ private fun PlayerWithOverlay(
     )
 }
 
+/**
+ * If your Segment has a confidence/score field, expose it here.
+ * Return Int percent (0–100) or null if not available.
+ *
+ * Example (uncomment and adjust if your Segment looks like: data class Segment(..., score: Float?)):
+ *   return segment.score?.let { (it * 100f).toInt().coerceIn(0, 100) }
+ */
 private fun segConfidence(segment: Segment): Int? {
-    // TODO: wire to your real confidence if available
+    // TODO: connect to your real confidence if available on Segment
     return null
 }

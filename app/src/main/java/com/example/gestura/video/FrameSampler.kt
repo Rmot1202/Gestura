@@ -1,4 +1,3 @@
-// video/FrameSampler.kt
 package com.example.gestura.video
 
 import android.content.Context
@@ -18,17 +17,13 @@ object FrameSampler {
         val durationSec = durMs / 1000.0
         if (durMs == 0L) return emptyList<Bitmap>() to 0.0
 
-        val frameTimesUs = sequence {
-            val stepUs = (1_000_000.0 / targetFps).roundToLong()
+        val stepUs = (1_000_000.0 / targetFps).roundToLong()
+        val frames = buildList<Bitmap> {
             var t = 0L
             while (t < durMs * 1000L) {
-                yield(t)
+                mmr.getFrameAtTime(t, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)?.let { add(it) }
                 t += stepUs
             }
-        }.toList()
-
-        val frames = frameTimesUs.mapNotNull { ts ->
-            mmr.getFrameAtTime(ts, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
         }
         mmr.release()
         return frames to durationSec
